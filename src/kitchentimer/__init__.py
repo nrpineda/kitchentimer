@@ -22,7 +22,14 @@ while running:
     # fill the screen with a color to wipe away anything from last frame
     screen.fill("purple")
 
-    pygame.draw.circle(screen, "red", player_pos, 40)
+    #pygame.draw.circle(screen, "red", player_pos, 40)
+
+    # pick a font you have and set its size
+    myfont = pygame.font.SysFont("Helvetica", 30)
+    # apply it to text on a label
+    label = myfont.render("1904", 1, "pink")
+    # put the label object on the screen at point x=100, y=100
+    screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
