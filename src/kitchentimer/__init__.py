@@ -21,10 +21,12 @@ while running:
     screen.fill("purple")
 
     # pick a font you have and set its size
-    myfont = pygame.font.SysFont("Helvetica", 30)
+    myfont = pygame.font.SysFont("Segoe UI", 50)
     # apply it to text on a label
-    s=int(seconds_remaining)
-    s=str(s)
+    minutes = int(seconds_remaining) //60
+    # s=str(s)
+    s = f"{minutes:02d}:{int(seconds_remaining)}" # "02:00"
+    
     label = myfont.render(s, 1, "pink")
     # put the label object on the screen at point x=100, y=100
     screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
