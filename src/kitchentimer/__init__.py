@@ -1,7 +1,6 @@
 import pygame
 SCREEN_WIDTH=1280
 SCREEN_HEIGHT=720
-total_seconds_remaining = 150
 
 # pygame setup
 pygame.init()
@@ -9,6 +8,26 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 dt = 0
+total_seconds_remaining = 150
+
+def process(screen: pygame.Surface, dt: float):
+    global total_seconds_remaining 
+    screen.fill("purple")
+    s = format_time(total_seconds_remaining)
+    draw_text(screen, s, x = SCREEN_WIDTH/4, y = SCREEN_HEIGHT/4)
+    draw_text(screen, s, x = SCREEN_WIDTH/2, y = SCREEN_HEIGHT/2)
+    total_seconds_remaining = total_seconds_remaining - dt
+
+def draw_text(screen: pygame.Surface, s: str, x: int, y: int):
+    myfont = pygame.font.SysFont("Helvetica", 50)
+    label = myfont.render(s, 1, "pink")
+    screen.blit(label, (x, y))
+
+def format_time(total_seconds:float):
+    minutes_and_seconds = (total_seconds) / 60
+    minutes = int(minutes_and_seconds)
+    seconds = (minutes_and_seconds - minutes) *60
+    return f"{minutes:02d}:{int(seconds):02d}" # "02:00"
 
 while running:
     # poll for events
@@ -17,23 +36,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    # fill the screen with a color to wipe away anything from last frame
-    screen.fill("purple")
-
-    # pick a font you have and set its size
-    myfont = pygame.font.SysFont("Segoe UI", 50)
-    # apply it to text on a label
-    minutes_and_seconds = (total_seconds_remaining) / 60
-    minutes = int(minutes_and_seconds)
-    seconds = (minutes_and_seconds - minutes) *60
-    s = f"{minutes:02d}:{int(seconds):02d}" # "02:00"
-    
-    label = myfont.render(s, 1, "pink")
-    # put the label object on the screen at point x=100, y=100
-    screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
-
-    total_seconds_remaining = total_seconds_remaining - dt
-    print(total_seconds_remaining)
+    process(screen, dt)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
