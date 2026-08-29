@@ -1,6 +1,7 @@
 import pygame
-SCREEN_WIDTH=1280
-SCREEN_HEIGHT=720
+import os
+SCREEN_WIDTH=1008
+SCREEN_HEIGHT=536
 
 # pygame setup
 pygame.init()
@@ -11,8 +12,10 @@ dt = 0
 total_seconds_remaining = 150
 
 def process(screen: pygame.Surface, dt: float):
+
     global total_seconds_remaining 
-    screen.fill("purple")
+    background = pygame.image.load(os.path.join("images", "background_1.png"))
+    screen.blit(background)
     s = format_time(total_seconds_remaining)
     draw_text(screen, s, x = SCREEN_WIDTH/4, y = SCREEN_HEIGHT/4)
     draw_text(screen, s, x = SCREEN_WIDTH/2, y = SCREEN_HEIGHT/2)
