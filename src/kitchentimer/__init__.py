@@ -23,9 +23,10 @@ while running:
     # pick a font you have and set its size
     myfont = pygame.font.SysFont("Segoe UI", 50)
     # apply it to text on a label
-    minutes = int(total_seconds_remaining) //60
-    # s=str(s)
-    s = f"{minutes:02d}:{int(total_seconds_remaining)%60}" # "02:00"
+    minutes_and_seconds = (total_seconds_remaining) / 60
+    minutes = int(minutes_and_seconds)
+    seconds = (minutes_and_seconds - minutes) *60
+    s = f"{minutes:02d}:{int(seconds):02d}" # "02:00"
     
     label = myfont.render(s, 1, "pink")
     # put the label object on the screen at point x=100, y=100
