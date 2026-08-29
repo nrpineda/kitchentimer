@@ -1,7 +1,7 @@
 import pygame
 SCREEN_WIDTH=1280
 SCREEN_HEIGHT=720
-value = 0
+value = 180
 
 # pygame setup
 pygame.init()
@@ -29,7 +29,8 @@ while running:
     # put the label object on the screen at point x=100, y=100
     screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
-    value = value + dt
+    value = value - dt
+    print(value)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
