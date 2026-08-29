@@ -11,15 +11,23 @@ running = True
 dt = 0
 total_seconds_remaining = 150
 
-def process(screen: pygame.Surface, dt: float):
+is_counting_down = False
 
+
+def process(screen: pygame.Surface, dt: float):
+    global is_counting_down
     global total_seconds_remaining 
+    
     background = pygame.image.load(os.path.join("images", "background_1.png"))
     screen.blit(background)
     s = format_time(total_seconds_remaining)
     draw_text(screen, s, x = SCREEN_WIDTH/4, y = SCREEN_HEIGHT/4)
     draw_text(screen, s, x = SCREEN_WIDTH/2, y = SCREEN_HEIGHT/2)
-    total_seconds_remaining = total_seconds_remaining - dt
+    if is_counting_down: 
+        total_seconds_remaining = total_seconds_remaining - dt
+    if pygame.mouse.get_just_pressed()[0]:
+        is_counting_down = not is_counting_down
+
 
 def draw_text(screen: pygame.Surface, s: str, x: int, y: int):
     myfont = pygame.font.SysFont("Helvetica", 50)
