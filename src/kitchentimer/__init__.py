@@ -9,39 +9,100 @@ screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 clock = pygame.time.Clock()
 running = True
 dt = 0
-total_seconds_remaining = 150
+total_seconds_remaining = 10.0
 
-is_counting_down = False
+is_alarm_played = False
+button_was_clicked = False
+
+button_position = (500,400)
+button_shape = pygame.Rect(button_position,(50,50))
 
 
 def process(screen: pygame.Surface, dt: float):
-    global is_counting_down
-    global total_seconds_remaining 
-    
+    global is_alarm_played
+
+    ## BACKGROUND
     background = pygame.image.load(os.path.join("images", "background_1.png"))
     screen.blit(background)
-    s = format_time(total_seconds_remaining)
-    draw_text(screen, s, x = SCREEN_WIDTH/4, y = SCREEN_HEIGHT/4)
-    draw_text(screen, s, x = SCREEN_WIDTH/2, y = SCREEN_HEIGHT/2)
-    if is_counting_down: 
-        total_seconds_remaining = total_seconds_remaining - dt
-   
-    rect=pygame.Rect((500,400),(50,50))
+
+    if button_was_clicked:
+        if total_seconds_remaining <= 0:
+            if not is_alarm_played:
+                # play_alarm_sound()
+                is_alarm_played = True
+            
+            if first_half_of_second(total_seconds_remaining):
+                pass # hide timer
+            else:
+                draw_timer(screen)
+        
+        else:
+            draw_timer(screen)
+
+        count_down(dt)
+    else:
+        draw_button(screen, button_shape)
+        process_button(button_shape)
+
+
+def first_half_of_second(seconds: float):
+    fraction = get_fraction(seconds)
+    return fraction < 0.5
+
+
+def get_fraction(x: float):
+    float_as_string = str(x) # '5.051' -> .051
+    whole, frac = float_as_string.split('.') # split to ['5', '051']
+    return float(f"0.{frac}")
+
+
+def count_down(dt):
+    global total_seconds_remaining
+    total_seconds_remaining = total_seconds_remaining - dt
+
+
+def draw_timer(screen):
+    formatted_time_string = format_time(total_seconds_remaining)
+    draw_text(screen, formatted_time_string, x = button_position[0] - 40, y = button_position[1] -10)
+
+
+def process_button(button_shape):
+    global button_was_clicked
+
+    if button_just_clicked(button_shape):
+        button_was_clicked = not button_was_clicked
+
+
+def draw_button(screen, rect):
     pygame.draw.rect(surface=screen, color="red", rect=rect)
-    if rect.collidepoint(pygame.mouse.get_pos()):
-        if pygame.mouse.get_just_pressed()[0]:
-                is_counting_down = not is_counting_down
+
+
+def button_just_clicked(rect):
+    return mouse_cursor_within_button(rect) and mouse_was_clicked()
+
+
+def mouse_cursor_within_button(rect):
+    return rect.collidepoint(pygame.mouse.get_pos())
+
+
+def mouse_was_clicked():
+    return pygame.mouse.get_just_pressed()[0]
+
 
 def draw_text(screen: pygame.Surface, s: str, x: int, y: int):
     myfont = pygame.font.SysFont("Helvetica", 50)
     label = myfont.render(s, 1, "pink")
     screen.blit(label, (x, y))
 
-def format_time(total_seconds:float):
-    minutes_and_seconds = (total_seconds) / 60
+
+def format_time(total_seconds: float):
+    t = abs(total_seconds)
+    minutes_and_seconds = (t) / 60
     minutes = int(minutes_and_seconds)
-    seconds = (minutes_and_seconds - minutes) *60
-    return f"{minutes:02d}:{int(seconds):02d}" # "02:00"
+    seconds = (minutes_and_seconds - minutes) * 60
+    negative = total_seconds < 0
+    return f"{'-' if negative else ''}{minutes:02d}:{int(seconds):02d}" # "02:00"
+
 
 while running:
     # poll for events
