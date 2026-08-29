@@ -1,7 +1,7 @@
 import pygame
 SCREEN_WIDTH=1280
 SCREEN_HEIGHT=720
-seconds_remaining = 180
+total_seconds_remaining = 150
 
 # pygame setup
 pygame.init()
@@ -23,16 +23,16 @@ while running:
     # pick a font you have and set its size
     myfont = pygame.font.SysFont("Segoe UI", 50)
     # apply it to text on a label
-    minutes = int(seconds_remaining) //60
+    minutes = int(total_seconds_remaining) //60
     # s=str(s)
-    s = f"{minutes:02d}:{int(seconds_remaining)}" # "02:00"
+    s = f"{minutes:02d}:{int(total_seconds_remaining)%60}" # "02:00"
     
     label = myfont.render(s, 1, "pink")
     # put the label object on the screen at point x=100, y=100
     screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
-    seconds_remaining = seconds_remaining - dt
-    print(seconds_remaining)
+    total_seconds_remaining = total_seconds_remaining - dt
+    print(total_seconds_remaining)
 
     # flip() the display to put your work on screen
     pygame.display.flip()
