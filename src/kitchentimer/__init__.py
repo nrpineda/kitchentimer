@@ -28,14 +28,15 @@ while running:
     # pick a font you have and set its size
     myfont = pygame.font.SysFont("Helvetica", 30)
     # apply it to text on a label
-    s=str(value)
+    s=int(value)
+    s=str(s)
     label = myfont.render(s, 1, "pink")
     # put the label object on the screen at point x=100, y=100
     screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
     keys = pygame.key.get_pressed()
-    if keys[pygame.K_w]:
-        value = value + 1
+   # if keys[pygame.K_w]:
+    value = value + dt
     # if keys[pygame.K_s]:
     #     #value = "0001"
     # if keys[pygame.K_a]:
