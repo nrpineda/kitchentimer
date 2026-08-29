@@ -2,7 +2,7 @@
 import pygame
 SCREEN_WIDTH=1280
 SCREEN_HEIGHT=720
-value = "initialtext"
+value = 0
 
 # pygame setup
 pygame.init()
@@ -28,19 +28,20 @@ while running:
     # pick a font you have and set its size
     myfont = pygame.font.SysFont("Helvetica", 30)
     # apply it to text on a label
-    label = myfont.render(value, 1, "pink")
+    s=str(value)
+    label = myfont.render(s, 1, "pink")
     # put the label object on the screen at point x=100, y=100
     screen.blit(label, (SCREEN_WIDTH/2, SCREEN_HEIGHT/2))
 
     keys = pygame.key.get_pressed()
     if keys[pygame.K_w]:
-        value = "YTHO"
-    if keys[pygame.K_s]:
-        value = "IDK"
-    if keys[pygame.K_a]:
-        value = "OKEE"
-    if keys[pygame.K_d]:
-        value = "^.^"
+        value = value + 1
+    # if keys[pygame.K_s]:
+    #     #value = "0001"
+    # if keys[pygame.K_a]:
+    #    # value = "0002"
+    # if keys[pygame.K_d]:
+    # value = "0003"
 
     # flip() the display to put your work on screen
     pygame.display.flip()
