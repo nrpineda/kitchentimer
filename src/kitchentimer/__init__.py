@@ -25,9 +25,12 @@ def process(screen: pygame.Surface, dt: float):
     draw_text(screen, s, x = SCREEN_WIDTH/2, y = SCREEN_HEIGHT/2)
     if is_counting_down: 
         total_seconds_remaining = total_seconds_remaining - dt
-    if pygame.mouse.get_just_pressed()[0]:
-        is_counting_down = not is_counting_down
-
+   
+    rect=pygame.Rect((500,400),(50,50))
+    pygame.draw.rect(surface=screen, color="red", rect=rect)
+    if rect.collidepoint(pygame.mouse.get_pos()):
+        if pygame.mouse.get_just_pressed()[0]:
+                is_counting_down = not is_counting_down
 
 def draw_text(screen: pygame.Surface, s: str, x: int, y: int):
     myfont = pygame.font.SysFont("Helvetica", 50)
