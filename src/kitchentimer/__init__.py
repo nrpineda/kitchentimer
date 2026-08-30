@@ -61,7 +61,7 @@ def count_down(dt):
 
 def draw_timer(screen):
     formatted_time_string = format_time(total_seconds_remaining)
-    draw_text(screen, formatted_time_string, x = button_position[0] - 40, y = button_position[1] -10)
+    draw_text(screen, formatted_time_string, position=button_position)
 
 
 def process_button():
@@ -88,10 +88,10 @@ def mouse_was_clicked():
     return pygame.mouse.get_just_pressed()[0]
 
 
-def draw_text(screen: pygame.Surface, s: str, x: int, y: int):
+def draw_text(screen: pygame.Surface, s: str, position: pygame.typing.Point):
     myfont = pygame.font.SysFont("Helvetica", 50)
     label = myfont.render(s, 1, "pink")
-    screen.blit(label, (x, y))
+    screen.blit(label, position)
 
 
 def format_time(total_seconds: float):
