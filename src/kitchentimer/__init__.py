@@ -60,8 +60,9 @@ def count_down(dt):
 
 
 def draw_timer(screen):
+    button_center = vec_sum(button_position, button_image.get_rect().center)
     formatted_time_string = format_time(total_seconds_remaining)
-    draw_text(screen, formatted_time_string, position=button_position)
+    draw_text(screen, formatted_time_string, position=button_center)
 
 
 def process_button():
@@ -88,10 +89,29 @@ def mouse_was_clicked():
     return pygame.mouse.get_just_pressed()[0]
 
 
-def draw_text(screen: pygame.Surface, s: str, position: pygame.typing.Point):
+def draw_text(screen: pygame.Surface, s: str, position: pygame.typing.Point, centered=True):
     myfont = pygame.font.SysFont("Helvetica", 50)
-    label = myfont.render(s, 1, "pink")
-    screen.blit(label, position)
+    label = myfont.render(s, True, "pink")
+    label_center = label.get_rect().center
+    if centered:
+        offset = vec_diff(position, label_center)
+        screen.blit(label, offset)
+    else:
+        screen.blit(label, position)
+
+
+def vec_diff(end_point: pygame.typing.Point, start_point: pygame.typing.Point) -> pygame.typing.Point:
+    return (
+        end_point[0] - start_point[0],
+        end_point[1] - start_point[1],
+    )
+
+
+def vec_sum(a: pygame.typing.Point, b: pygame.typing.Point) -> pygame.typing.Point:
+    return (
+        a[0] + b[0],
+        a[1] + b[1],
+    )
 
 
 def format_time(total_seconds: float):
