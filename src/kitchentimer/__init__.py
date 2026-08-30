@@ -14,7 +14,7 @@ is_alarm_played = False
 button_was_clicked = False
 
 button_position = (background.get_size()[0]*0.10, background.get_size()[1]*0.15)
-button_image = pygame.image.load(os.path.join("images", "timer.png")) 
+button_image = pygame.image.load(os.path.join("images", "timer2.png")) 
 
 
 def process(screen: pygame.Surface, dt: float):
