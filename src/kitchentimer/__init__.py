@@ -90,8 +90,8 @@ def mouse_was_clicked():
 
 
 def draw_text(screen: pygame.Surface, s: str, position: pygame.typing.Point, centered=True):
-    myfont = pygame.font.SysFont("Helvetica", 50)
-    label = myfont.render(s, True, "pink")
+    myfont = pygame.font.SysFont("Cooper Black", 50)
+    label = myfont.render(s, True, "black")
     label_center = label.get_rect().center
     if centered:
         offset = vec_diff(position, label_center)
