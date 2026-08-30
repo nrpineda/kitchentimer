@@ -1,11 +1,10 @@
 import pygame
 import os
-SCREEN_WIDTH=1008
-SCREEN_HEIGHT=536
 
 # pygame setup
 pygame.init()
-screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+background = pygame.image.load(os.path.join("images", "peakpx.jpg"))
+screen = pygame.display.set_mode(background.get_size())
 clock = pygame.time.Clock()
 running = True
 dt = 0
@@ -14,7 +13,7 @@ total_seconds_remaining = 10.0
 is_alarm_played = False
 button_was_clicked = False
 
-button_position = (500,400)
+button_position = (background.get_size()[0]*0.10, background.get_size()[1]*0.15)
 button_shape = pygame.Rect(button_position,(50,50))
 
 
@@ -22,7 +21,6 @@ def process(screen: pygame.Surface, dt: float):
     global is_alarm_played
 
     ## BACKGROUND
-    background = pygame.image.load(os.path.join("images", "background_1.png"))
     screen.blit(background)
 
     if button_was_clicked:
