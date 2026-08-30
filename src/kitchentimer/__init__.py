@@ -14,7 +14,7 @@ is_alarm_played = False
 button_was_clicked = False
 
 button_position = (background.get_size()[0]*0.10, background.get_size()[1]*0.15)
-button_shape = pygame.Rect(button_position,(50,50))
+button_image = pygame.image.load(os.path.join("images", "timer.png")) 
 
 
 def process(screen: pygame.Surface, dt: float):
@@ -39,8 +39,8 @@ def process(screen: pygame.Surface, dt: float):
 
         count_down(dt)
     else:
-        draw_button(screen, button_shape)
-        process_button(button_shape)
+        draw_button(screen)
+        process_button()
 
 
 def first_half_of_second(seconds: float):
@@ -64,15 +64,16 @@ def draw_timer(screen):
     draw_text(screen, formatted_time_string, x = button_position[0] - 40, y = button_position[1] -10)
 
 
-def process_button(button_shape):
+def process_button():
     global button_was_clicked
-
-    if button_just_clicked(button_shape):
+    rectangle = button_image.get_rect()
+    rectangle = rectangle.move(button_position)
+    if button_just_clicked(rectangle):
         button_was_clicked = not button_was_clicked
 
 
-def draw_button(screen, rect):
-    pygame.draw.rect(surface=screen, color="red", rect=rect)
+def draw_button(screen: pygame.Surface):
+    screen.blit(button_image, button_position)
 
 
 def button_just_clicked(rect):
@@ -80,8 +81,8 @@ def button_just_clicked(rect):
 
 
 def mouse_cursor_within_button(rect):
-    return rect.collidepoint(pygame.mouse.get_pos())
-
+    t = rect.collidepoint(pygame.mouse.get_pos())
+    return t
 
 def mouse_was_clicked():
     return pygame.mouse.get_just_pressed()[0]
