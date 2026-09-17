@@ -2,6 +2,8 @@ import pygame
 import os
 from enum import StrEnum
 
+EGG_COOK_TIME_SECONDS = 10.0
+
 # pygame setup
 pygame.init()
 background = pygame.image.load(os.path.join("images", "peakpx.jpg"))
@@ -9,7 +11,7 @@ screen = pygame.display.set_mode(background.get_size())
 clock = pygame.time.Clock()
 running = True
 dt = 0
-total_seconds_remaining = 10.0
+total_seconds_remaining = EGG_COOK_TIME_SECONDS
 
 class TimerState(StrEnum):
     STOPPED = 'Stopped'
@@ -25,63 +27,61 @@ button_image = pygame.image.load(os.path.join("images", "timer2.png"))
 alarm_sound = pygame.mixer.Sound("audio/freesound_community-alarm-clock-short-6402.mp3")
 sizzling_sound = pygame.mixer.Sound("audio/oxidvideos-sizzlingcooking-eggs-414333.mp3")
 
+## 'process' functions will be called every frame, and have some code that executes (most likely)
+## 'handle' functions may still be called every frame, but are typically checking for a condition so as to execute only once before changing states.
 def process(screen: pygame.Surface, dt: float):
     ## BACKGROUND
     screen.blit(background)
-    draw_text(screen=screen, s=timer_state, position=(400, 100))
+    draw_text(screen=screen, s=timer_state, position=(400, 100)) ## debug state display
 
     if timer_state == TimerState.STOPPED:
-        process_stopped_timer(screen)
+        process_state_stopped(screen)
     elif timer_state == TimerState.RUNNING:
-        process_running_timer(screen, dt)
+        process_state_running(screen, dt)
     elif timer_state == TimerState.OVERTIME:
-        process_overtime_timer(screen, dt)
+        process_state_overtime(screen, dt)
     elif timer_state == TimerState.PAUSED:
-        process_paused_timer(screen)
+        process_state_paused(screen)
     elif timer_state == TimerState.FINAL_HOLD:
-        process_final_hold_timer(screen)
+        process_state_final_hold(screen)
     else:
         print('WARNING: Invalid timer state.')
 
 
-def process_paused_timer(screen):
+def process_state_paused(screen):
     draw_timer(screen)
-
-    handle_click_to_start()
-    # handle_click_to_resume()
+    handle_transition_run()
 
 
-def process_final_hold_timer(screen):
+def process_state_final_hold(screen):
     draw_timer(screen)
-    handle_click_to_reset()
+    handle_transition_reset()
 
 
-def process_running_timer(screen, dt):
-    global timer_state
-
+def process_state_running(screen, dt):
     draw_timer(screen)
     count_down(dt)
     
     if total_seconds_remaining <= 0:
-        timer_state = TimerState.OVERTIME
+        set_timer_state(TimerState.OVERTIME)
         alarm_sound.play(loops=-1)
-    handle_click_to_pause()
     
+    handle_transition_pause()
 
-def process_overtime_timer(screen, dt):
+
+def process_state_overtime(screen, dt):
     if first_half_of_second(total_seconds_remaining):
         pass # hide timer
     else:
         draw_timer(screen)
 
     count_down(dt)
-    handle_click_to_hold()
-    
+    handle_transition_hold()
 
 
-def process_stopped_timer(screen):
+def process_state_stopped(screen):
     draw_button(screen)
-    handle_click_to_start()
+    handle_transition_run()
 
 
 def first_half_of_second(seconds: float):
@@ -96,8 +96,7 @@ def get_fraction(x: float):
 
 
 def count_down(dt):
-    global total_seconds_remaining
-    total_seconds_remaining = total_seconds_remaining - dt
+    set_total_seconds_remaining(total_seconds_remaining - dt)
 
 
 def draw_timer(screen):
@@ -106,60 +105,59 @@ def draw_timer(screen):
     draw_text(screen, formatted_time_string, position=button_center)
 
 
-def handle_click_to_start():
-    global timer_state
-    rectangle = button_image.get_rect()
-    rectangle = rectangle.move(button_position)
-    if button_just_clicked(rectangle):
-        timer_state = TimerState.RUNNING
-        # timer_state = 'running'
+## Maybe some of these handlers will listen for RMB or for a continuous click,
+## or for a key + click.
+## So I think it's acceptable to leave the duplicate "if button_just_clicked():" for now.
+def handle_transition_run():
+    if button_just_clicked():
+        set_timer_state(TimerState.RUNNING)
 
 
-def handle_click_to_pause():
-    global timer_state
-    rectangle = button_image.get_rect()
-    rectangle = rectangle.move(button_position)
-    if button_just_clicked(rectangle):
-        timer_state = TimerState.PAUSED
+def handle_transition_pause():
+    if button_just_clicked():
+        set_timer_state(TimerState.PAUSED)
 
 
-def handle_click_to_hold():
-    global timer_state
-    rectangle = button_image.get_rect()
-    rectangle = rectangle.move(button_position)
-    if button_just_clicked(rectangle):
-        timer_state = TimerState.FINAL_HOLD
+def handle_transition_hold():
+    if button_just_clicked():
+        set_timer_state(TimerState.FINAL_HOLD)
         alarm_sound.stop()
-# def handle_click_to_resume():
-#     global timer_state
-#     rectangle = button_image.get_rect()
-#     rectangle = rectangle.move(button_position)
-#     if button_just_clicked(rectangle):
-#         timer_state = 'running'
 
 
-def handle_click_to_reset():
+def handle_transition_reset():
+    if button_just_clicked():
+        set_timer_state(TimerState.STOPPED)
+        set_total_seconds_remaining(EGG_COOK_TIME_SECONDS)
+
+
+def button_just_clicked() -> bool:
+    button_rect = button_image.get_rect()
+    button_rect = button_rect.move(button_position)
+    return rect_just_clicked(button_rect)
+
+
+def set_timer_state(x: TimerState):
     global timer_state
-    global total_seconds_remaining
+    timer_state = x
 
-    rectangle = button_image.get_rect()
-    rectangle = rectangle.move(button_position)
-    if button_just_clicked(rectangle):
-        timer_state = TimerState.STOPPED
-        total_seconds_remaining = 10.0
+
+def set_total_seconds_remaining(x: float):
+    global total_seconds_remaining
+    total_seconds_remaining = x
 
 
 def draw_button(screen: pygame.Surface):
     screen.blit(button_image, button_position)
 
 
-def button_just_clicked(rect):
-    return mouse_cursor_within_button(rect) and mouse_was_clicked()
+def rect_just_clicked(rect):
+    return mouse_cursor_within_rect(rect) and mouse_was_clicked()
 
 
-def mouse_cursor_within_button(rect):
+def mouse_cursor_within_rect(rect):
     t = rect.collidepoint(pygame.mouse.get_pos())
     return t
+
 
 def mouse_was_clicked():
     return pygame.mouse.get_just_pressed()[0]
