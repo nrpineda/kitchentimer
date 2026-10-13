@@ -22,10 +22,13 @@ class TimerState(StrEnum):
 
 timer_state: TimerState = TimerState.STOPPED
 
-button_position = (background.get_size()[0]*0.10, background.get_size()[1]*0.15)
-button_image = pygame.image.load(os.path.join("images", "timer2.png")) 
+button_image = pygame.image.load(os.path.join("images", "timer2.png"))
 alarm_sound = pygame.mixer.Sound("audio/freesound_community-alarm-clock-short-6402.mp3")
 sizzling_sound = pygame.mixer.Sound("audio/oxidvideos-sizzlingcooking-eggs-414333.mp3")
+
+button_position_1 = (background.get_size()[0]*0.10, background.get_size()[1]*0.15)
+button_position_2 = (background.get_size()[0]*0.10, background.get_size()[1]*0.30)
+button_position_3 = (background.get_size()[0]*0.10, background.get_size()[1]*0.45)
 
 ## 'process' functions will be called every frame, and have some code that executes (most likely)
 ## 'handle' functions may still be called every frame, but are typically checking for a condition so as to execute only once before changing states.
@@ -34,54 +37,55 @@ def process(screen: pygame.Surface, dt: float):
     screen.blit(background)
     draw_text(screen=screen, s=timer_state, position=(400, 100)) ## debug state display
 
-    if timer_state == TimerState.STOPPED:
-        process_state_stopped(screen)
-    elif timer_state == TimerState.RUNNING:
-        process_state_running(screen, dt)
-    elif timer_state == TimerState.OVERTIME:
-        process_state_overtime(screen, dt)
-    elif timer_state == TimerState.PAUSED:
-        process_state_paused(screen)
-    elif timer_state == TimerState.FINAL_HOLD:
-        process_state_final_hold(screen)
-    else:
-        print('WARNING: Invalid timer state.')
+    for button_position in (button_position_1, button_position_2, button_position_3):
+        if timer_state == TimerState.STOPPED:
+            process_state_stopped(screen, button_position)
+        elif timer_state == TimerState.RUNNING:
+            process_state_running(screen, dt, button_position)
+        elif timer_state == TimerState.OVERTIME:
+            process_state_overtime(screen, dt, button_position)
+        elif timer_state == TimerState.PAUSED:
+            process_state_paused(screen, button_position)
+        elif timer_state == TimerState.FINAL_HOLD:
+            process_state_final_hold(screen, button_position)
+        else:
+            print('WARNING: Invalid timer state.')
 
 
-def process_state_paused(screen):
-    draw_timer(screen)
-    handle_transition_run()
+def process_state_paused(screen, button_position):
+    draw_timer(screen, button_position)
+    handle_transition_run(button_position)
 
 
-def process_state_final_hold(screen):
-    draw_timer(screen)
-    handle_transition_reset()
+def process_state_final_hold(screen, button_position):
+    draw_timer(screen, button_position)
+    handle_transition_reset(button_position)
 
 
-def process_state_running(screen, dt):
-    draw_timer(screen)
+def process_state_running(screen, dt, button_position):
+    draw_timer(screen, button_position)
     count_down(dt)
     
     if total_seconds_remaining <= 0:
         set_timer_state(TimerState.OVERTIME)
         alarm_sound.play(loops=-1)
     
-    handle_transition_pause()
+    handle_transition_pause(button_position)
 
 
-def process_state_overtime(screen, dt):
+def process_state_overtime(screen, dt, button_position):
     if first_half_of_second(total_seconds_remaining):
         pass # hide timer
     else:
-        draw_timer(screen)
+        draw_timer(screen, button_position)
 
     count_down(dt)
-    handle_transition_hold()
+    handle_transition_hold(button_position)
 
 
-def process_state_stopped(screen):
-    draw_button(screen)
-    handle_transition_run()
+def process_state_stopped(screen, button_position):
+    draw_button(screen, button_position)
+    handle_transition_run(button_position)
 
 
 def first_half_of_second(seconds: float):
@@ -99,7 +103,7 @@ def count_down(dt):
     set_total_seconds_remaining(total_seconds_remaining - dt)
 
 
-def draw_timer(screen):
+def draw_timer(screen, button_position):
     button_center = vec_sum(button_position, button_image.get_rect().center)
     formatted_time_string = format_time(total_seconds_remaining)
     draw_text(screen, formatted_time_string, position=button_center)
@@ -108,29 +112,29 @@ def draw_timer(screen):
 ## Maybe some of these handlers will listen for RMB or for a continuous click,
 ## or for a key + click.
 ## So I think it's acceptable to leave the duplicate "if button_just_clicked():" for now.
-def handle_transition_run():
-    if button_just_clicked():
+def handle_transition_run(button_position):
+    if button_just_clicked(button_position):
         set_timer_state(TimerState.RUNNING)
 
 
-def handle_transition_pause():
-    if button_just_clicked():
+def handle_transition_pause(button_position):
+    if button_just_clicked(button_position):
         set_timer_state(TimerState.PAUSED)
 
 
-def handle_transition_hold():
-    if button_just_clicked():
+def handle_transition_hold(button_position):
+    if button_just_clicked(button_position):
         set_timer_state(TimerState.FINAL_HOLD)
         alarm_sound.stop()
 
 
-def handle_transition_reset():
-    if button_just_clicked():
+def handle_transition_reset(button_position):
+    if button_just_clicked(button_position):
         set_timer_state(TimerState.STOPPED)
         set_total_seconds_remaining(EGG_COOK_TIME_SECONDS)
 
 
-def button_just_clicked() -> bool:
+def button_just_clicked(button_position) -> bool:
     button_rect = button_image.get_rect()
     button_rect = button_rect.move(button_position)
     return rect_just_clicked(button_rect)
@@ -146,7 +150,7 @@ def set_total_seconds_remaining(x: float):
     total_seconds_remaining = x
 
 
-def draw_button(screen: pygame.Surface):
+def draw_button(screen: pygame.Surface, button_position):
     screen.blit(button_image, button_position)
 
 
